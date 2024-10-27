@@ -1,0 +1,8 @@
+numpy
+pandas
+torch
+transformers
+datasets
+ensure
+python-box
+-e .
