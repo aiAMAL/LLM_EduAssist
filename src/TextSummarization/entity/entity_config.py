@@ -8,3 +8,11 @@ class DataIngestionConfig:
     dataset_dir: Path
     source_data: str
 
+
+@dataclass(frozen=True)
+class DataValidationConfig:
+    root_dir: Path
+    dataset_dir: Path
+    status_file: Path
+    required_data_folders: list[str]
+

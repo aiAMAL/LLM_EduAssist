@@ -1,1 +1,4 @@
-from .entity_config import DataIngestionConfig
+from .entity_config import (
+    DataIngestionConfig,
+    DataValidationConfig
+)

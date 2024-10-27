@@ -5,5 +5,12 @@ data_ingestion:
   dataset_dir: artifacts/data_ingestion/samsum_dataset
   source_data: 'knkarthick/dialogsum'
 
+data_validation:
+  root_dir: artifacts/data_validation
+  dataset_dir: artifacts/data_ingestion/samsum_dataset
+  status_file: artifacts/data_validation/status.txt
+  required_data_folders: ['train', 'validation', 'test']
+
+
 
 
