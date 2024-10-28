@@ -11,6 +11,11 @@ data_validation:
   status_file: artifacts/data_validation/status.txt
   required_data_folders: ['train', 'validation', 'test']
 
+data_transformation:
+  root_dir: artifacts/data_transformation
+  dataset_dir: artifacts/data_ingestion/samsum_dataset
+  tokenizer_checkpoint: &tokenizer_checkpoint google/flan-t5-base
+
 
 
 

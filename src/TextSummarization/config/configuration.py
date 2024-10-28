@@ -1,7 +1,8 @@
 from pathlib import Path
 from src.TextSummarization.utils import read_yaml, create_directories
 from src.TextSummarization.entity import (DataIngestionConfig,
-                                          DataValidationConfig)
+                                          DataValidationConfig,
+                                          DataTransformationConfig)
 
 CONFIG_FILE_PATH = Path('config/config.yaml')
 
@@ -44,6 +45,22 @@ class ConfigurationManager:
         )
 
         return data_validation_config
+
+    # ====================================================================
+    # -------------------------- Data Transformation --------------------------
+    # ====================================================================
+
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        config = self.config.data_transformation
+        create_directories([Path(config.root_dir)])
+
+        data_transformation_config = DataTransformationConfig(
+            root_dir=config.root_dir,
+            dataset_dir=config.dataset_dir,
+            tokenizer_checkpoint=config.tokenizer_checkpoint
+        )
+
+        return data_transformation_config
 
 
 

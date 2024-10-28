@@ -4,6 +4,8 @@ from src.TextSummarization.exception import CustomException
 from src.TextSummarization.config import ConfigurationManager
 from src.TextSummarization.component.data_ingestion import DataIngestion
 from src.TextSummarization.component.data_validation import DataValidation
+from src.TextSummarization.component.data_transformation import DataTransformation
+
 
 try:
     # Configuration setup
@@ -22,7 +24,9 @@ try:
         raise CustomException("Data validation failed.")
 
     # Data transformation process
-    # ...
+    data_transformation_config = config.get_data_transformation_config()
+    data_transformation = DataTransformation(data_transformation_config)
+    data_transformation.convert_and_save_dataset()
 
     # Model training process
     # ...

@@ -4,6 +4,7 @@ from pathlib import Path
 from box import ConfigBox
 from box.exceptions import BoxValueError
 from ensure import ensure_annotations
+from datasets import load_from_disk
 from src.TextSummarization.logger import logger
 from src.TextSummarization.exception import CustomException
 
@@ -55,4 +56,23 @@ def create_directories(path_to_directories: list[Path], verbose: bool = True):
         path.mkdir(parents=True, exist_ok=True)
         if verbose:
             logger.info(f'Created directory at {path}')
+
+
+def load_dataset_from_disk(dataset_path):
+    """
+    Load the preprocessed dataset from the specified disk path.
+
+    Returns:
+        Dataset: The loaded dataset.
+    """
+    if not dataset_path.exists():
+        logger.error(f"Dataset path does not exist: {dataset_path}")
+        raise FileNotFoundError(f"Dataset path '{dataset_path}' not found.")
+
+    try:
+        dataset = load_from_disk(str(dataset_path))
+        return dataset
+    except Exception as e:
+        logger.error(f'Failed to load dataset from {dataset_path}: {e}')
+        raise RuntimeError(f'Error loading dataset: {e}')
 
