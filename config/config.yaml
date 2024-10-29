@@ -14,8 +14,15 @@ data_validation:
 data_transformation:
   root_dir: artifacts/data_transformation
   dataset_dir: artifacts/data_ingestion/samsum_dataset
+  tokenized_dataset_dir: artifacts/data_transformation/tokenized_samsum_dataset
   tokenizer_checkpoint: &tokenizer_checkpoint google/flan-t5-base
 
+model_training:
+  root_dir: artifacts/model_training
+  dataset_dir: artifacts/data_transformation/tokenized_samsum_dataset
+  model_dir: artifacts/model_training/Summarization_Google_F5
+  tokenizer_dir: artifacts/model_training/tokenizer
+  model_checkpoint: *tokenizer_checkpoint
 
 
 

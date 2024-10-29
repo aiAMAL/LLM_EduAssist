@@ -5,6 +5,8 @@ from src.TextSummarization.config import ConfigurationManager
 from src.TextSummarization.component.data_ingestion import DataIngestion
 from src.TextSummarization.component.data_validation import DataValidation
 from src.TextSummarization.component.data_transformation import DataTransformation
+from src.TextSummarization.component.model_training_peft import ModelTraining      # Use PEFT
+# from src.TextSummarization.component.model_training import ModelTraining
 
 
 try:
@@ -29,7 +31,9 @@ try:
     data_transformation.convert_and_save_dataset()
 
     # Model training process
-    # ...
+    model_trainer_config = config.get_model_training_config()
+    model_trainer = ModelTraining(model_trainer_config)
+    model_trainer.train()
 
     # Model evaluation process
     # ...

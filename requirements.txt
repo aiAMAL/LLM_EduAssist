@@ -2,7 +2,9 @@ numpy
 pandas
 torch
 transformers
+transformers[torch]
 datasets
 ensure
 python-box
+peft
 -e .

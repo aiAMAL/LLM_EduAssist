@@ -1,4 +1,6 @@
 import sys
+import torch
+import numpy as np
 from pathlib import Path
 from src.TextSummarization.entity import DataTransformationConfig
 from src.TextSummarization.logger import logger
@@ -36,8 +38,8 @@ class DataTransformation:
             prompt = [f"{start_prompt} {dialogue} {end_prompt}" for dialogue in example_batch['dialogue']]
 
             # Tokenize dialogues (inputs) & summaries (targets)
-            input_encodings = self.tokenizer(prompt, truncation=True)
-            target_encodings = self.tokenizer(example_batch['summary'], truncation=True)
+            input_encodings = self.tokenizer(prompt, truncation=True, padding=True, return_tensors='pt')
+            target_encodings = self.tokenizer(example_batch['summary'], truncation=True, padding=True, return_tensors='pt')
 
             return {
                 'input_ids': input_encodings['input_ids'],
@@ -48,7 +50,7 @@ class DataTransformation:
             logger.error(f'Error during tokenization: {e}')
             raise CustomException(e, sys)
 
-    def process_dataset(self, dataset, dataset_name: str, columns_to_remove: list):
+    def process_dataset(self, dataset, dataset_name: str, columns_to_remove: list, filter_frequency: int = 1):
         """
         Processes the dataset by converting it to tokenized features, removing unnecessary columns, and saving it.
 
@@ -63,6 +65,10 @@ class DataTransformation:
         """
         try:
             logger.info(f"Processing {dataset_name} dataset...")
+
+            # Optional: Filter dataset for quicker processing during testing code
+            dataset = dataset.filter(lambda example, index: index % filter_frequency == 0, with_indices=True)
+            # logger.info(f"Filtered {dataset_name} dataset size: {dataset_pt.num_rows}")
 
             # Apply tokenization
             dataset_pt = dataset.map(self.convert_examples_to_features, batched=True)
@@ -85,7 +91,7 @@ class DataTransformation:
         Loads, processes, and saves tokenized datasets for training and validation.
         """
         try:
-            logger.info(f"\n\n\n\n------- >>  Data Transformation: Process train and validation datasets...")
+            logger.info(f"\n\n------- >>  Data Transformation: Process train and validation datasets...")
 
             # Load the dataset
             logger.info(f"Loading dataset from {self.config.dataset_dir}...")
@@ -95,15 +101,13 @@ class DataTransformation:
             columns_to_remove = ['id', 'topic', 'dialogue', 'summary']
 
             # Process the train and validation datasets
-            train_dataset = self.process_dataset(dataset_samsum['train'], 'train', columns_to_remove)
-            valid_dataset = self.process_dataset(dataset_samsum['validation'], 'validation', columns_to_remove)
-
-            # Define the save path and create directory if it doesn't exist
-            save_path = Path(self.config.root_dir) / 'tokenized_samsum_dataset'
-            save_path.mkdir(parents=True, exist_ok=True)
+            train_dataset = self.process_dataset(dataset_samsum['train'], 'train', columns_to_remove, filter_frequency=250)  #50)
+            valid_dataset = self.process_dataset(dataset_samsum['validation'], 'validation', columns_to_remove, filter_frequency=20)#  20)
 
             # Save processed datasets to disk
             logger.info(f"Saving tokenized datasets...")
+            save_path = self.config.tokenized_dataset_dir
+
             processed_dataset_pt = DatasetDict({
                 'train': train_dataset,
                 'validation': valid_dataset

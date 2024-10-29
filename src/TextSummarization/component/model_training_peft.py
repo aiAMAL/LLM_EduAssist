@@ -8,6 +8,7 @@ from transformers import (
     TrainingArguments,
     Trainer
 )
+from peft import get_peft_model, LoraConfig
 from src.TextSummarization.entity import ModelTrainingConfig
 from src.TextSummarization.utils import load_dataset_from_disk
 from src.TextSummarization.exception import CustomException
@@ -15,6 +16,10 @@ from src.TextSummarization.logger import logger
 
 
 class ModelTraining:
+    """
+    Class for model training with LoRA configuration and Hugging Face's Trainer API.
+    """
+
     def __init__(self, config: ModelTrainingConfig):
         self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -32,6 +37,24 @@ class ModelTraining:
             logger.info('Model and tokenizer loaded successfully.')
         except Exception as e:
             logger.error(f"Failed to load model or tokenizer: {e}")
+            raise CustomException(e, sys)
+
+    def set_lora_config(self) -> LoraConfig:
+        """Set up LoRA configuration for the model."""
+
+        logger.info('Setting up LoRA configuration...')
+        try:
+            lora_config = LoraConfig(
+                r=self.config.lora_r,
+                lora_alpha=self.config.lora_alpha,
+                target_modules=self.config.target_modules,
+                lora_dropout=self.config.lora_dropout,
+                bias=self.config.bias,
+                task_type=self.config.task_type
+            )
+            return lora_config
+        except Exception as e:
+            logger.error(f"Failed to set up LoRA configuration: {e}")
             raise CustomException(e, sys)
 
     def _get_training_args(self) -> TrainingArguments:
@@ -57,10 +80,9 @@ class ModelTraining:
         return trainer_args
 
     def train(self):
+        """Train the model using the Trainer API with LoRA configuration."""
+        logger.info("\n\n------- >>  Starting the training process...")
         try:
-            """Train the model using the Trainer API."""
-            logger.info("\n\nStarting the training process...")
-
             # Load model, tokenizer, and dataset
             self.load_model_and_tokenizer()
 
@@ -69,12 +91,16 @@ class ModelTraining:
             # Prepare data collator for dynamic padding
             data_collator = DataCollatorForSeq2Seq(tokenizer=self.tokenizer, model=self.model, padding=True)
 
+            # Apply LoRA to the model
+            lora_config = self.set_lora_config()
+            model_peft = get_peft_model(self.model, lora_config)
+
             # Configure training arguments
             trainer_args = self._get_training_args()
 
             # Initialize a Trainer instance
             trainer = Trainer(
-                model=self.model,
+                model=model_peft,
                 args=trainer_args,
                 tokenizer=self.tokenizer,
                 data_collator=data_collator,
