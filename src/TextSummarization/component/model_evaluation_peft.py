@@ -10,6 +10,7 @@ from src.TextSummarization.exception import CustomException
 from src.TextSummarization.entity import ModelEvaluationConfig
 from src.TextSummarization.utils import load_dataset_from_disk
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from peft import PeftModel
 
 class ModelEvaluation:
     def __init__(self, config: ModelEvaluationConfig):
@@ -17,8 +18,10 @@ class ModelEvaluation:
         Initializes ModelEvaluation with provided configuration and device setup.
         """
         self.config = config
-        self.model = None
+        # self.model = None
         self.tokenizer = None
+        self.base_peft_model = None
+        self.peft_model = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def load_model_and_tokenizer(self):
@@ -28,7 +31,17 @@ class ModelEvaluation:
         logger.info('Loading model and tokenizer...')
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(self.config.tokenizer_dir)
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(self.config.model_dir).to(self.device)    # if GPU add: ", torch_dtype=torch.bfloat16"
+            # self.model = AutoModelForSeq2SeqLM.from_pretrained(self.config.model_dir).to(self.device)
+            self.base_peft_model = AutoModelForSeq2SeqLM.from_pretrained(self.config.base_model_checkpoint).to(self.device)  # if GPU add: ", torch_dtype=torch.bfloat16"
+
+            # Load the pre-trained PEFT model checkpoint
+            self.peft_model = PeftModel.from_pretrained(
+                self.base_peft_model,
+                self.config.model_dir,
+                # torch_dtype=torch.bfloat16,
+                is_trainable=False
+            ).to(self.device)
+
             logger.info('Model and tokenizer loaded successfully.')
         except Exception as e:
             logger.error(f"Failed to load model or tokenizer: {e}")
@@ -135,7 +148,7 @@ class ModelEvaluation:
                 print('\nh')
 
                 # Generate summaries
-                summaries = self.model.generate(
+                summaries = self.peft_model.generate(
                     input_ids=input_batch.to(self.device),
                     attention_mask=attention_mask_batch.to(self.device),
                     max_length=128,

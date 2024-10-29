@@ -2,5 +2,6 @@ from .entity_config import (
     DataIngestionConfig,
     DataValidationConfig,
     DataTransformationConfig,
-    ModelTrainingConfig
+    ModelTrainingConfig,
+    ModelEvaluationConfig
 )

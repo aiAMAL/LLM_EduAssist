@@ -5,8 +5,10 @@ from src.TextSummarization.config import ConfigurationManager
 from src.TextSummarization.component.data_ingestion import DataIngestion
 from src.TextSummarization.component.data_validation import DataValidation
 from src.TextSummarization.component.data_transformation import DataTransformation
-from src.TextSummarization.component.model_training_peft import ModelTraining      # Use PEFT
 # from src.TextSummarization.component.model_training import ModelTraining
+# from src.TextSummarization.component.model_evaluation import ModelEvaluation
+from src.TextSummarization.component.model_training_peft import ModelTraining      # Use PEFT
+from src.TextSummarization.component.model_evaluation_peft import ModelEvaluation
 
 
 try:
@@ -36,7 +38,9 @@ try:
     model_trainer.train()
 
     # Model evaluation process
-    # ...
+    model_evaluation_config = config.get_model_evaluation_config()
+    model_evaluation = ModelEvaluation(model_evaluation_config)
+    model_evaluation.evaluate_model()
 
     logger.info("Pipeline completed successfully.")
 

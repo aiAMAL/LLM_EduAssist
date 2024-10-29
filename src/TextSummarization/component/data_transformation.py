@@ -101,8 +101,8 @@ class DataTransformation:
             columns_to_remove = ['id', 'topic', 'dialogue', 'summary']
 
             # Process the train and validation datasets
-            train_dataset = self.process_dataset(dataset_samsum['train'], 'train', columns_to_remove, filter_frequency=250)  #50)
-            valid_dataset = self.process_dataset(dataset_samsum['validation'], 'validation', columns_to_remove, filter_frequency=20)#  20)
+            train_dataset = self.process_dataset(dataset_samsum['train'], 'train', columns_to_remove, filter_frequency=2500)  #50)
+            valid_dataset = self.process_dataset(dataset_samsum['validation'], 'validation', columns_to_remove, filter_frequency=200)#  20)
 
             # Save processed datasets to disk
             logger.info(f"Saving tokenized datasets...")

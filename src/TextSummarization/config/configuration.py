@@ -3,7 +3,8 @@ from src.TextSummarization.utils import read_yaml, create_directories
 from src.TextSummarization.entity import (DataIngestionConfig,
                                           DataValidationConfig,
                                           DataTransformationConfig,
-                                          ModelTrainingConfig)
+                                          ModelTrainingConfig,
+                                          ModelEvaluationConfig)
 
 CONFIG_FILE_PATH = Path('config/config.yaml')
 PARAMS_FILE_PATH = Path('config/params.yaml')
@@ -106,8 +107,22 @@ class ConfigurationManager:
 
         return model_training_config
 
+    # ====================================================================
+    # ------------------------ Model Evaluation -----------------------
+    # ====================================================================
 
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        config = self.config.model_evaluation
+        create_directories([Path(config.root_dir)])
 
+        model_evaluation_config = ModelEvaluationConfig(
+            root_dir=config.root_dir,
+            dataset_dir=config.dataset_dir,
+            tokenized_test_dataset_dir=config.tokenized_test_dataset_dir,
+            model_dir=config.model_dir,
+            tokenizer_dir=config.tokenizer_dir,
+            metrics_file_name=config.metrics_file_name,
+            base_model_checkpoint=config.base_model_checkpoint
+        )
 
-
-
+        return model_evaluation_config

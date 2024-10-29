@@ -8,7 +8,7 @@ from transformers import (
     TrainingArguments,
     Trainer
 )
-from peft import get_peft_model, LoraConfig
+from peft import get_peft_model, LoraConfig, PeftConfig, PeftModel
 from src.TextSummarization.entity import ModelTrainingConfig
 from src.TextSummarization.utils import load_dataset_from_disk
 from src.TextSummarization.exception import CustomException
@@ -25,6 +25,7 @@ class ModelTraining:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.tokenizer = None
         self.model = None
+        self.peft_model = None
 
     def load_model_and_tokenizer(self):
         """
@@ -34,6 +35,7 @@ class ModelTraining:
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_checkpoint)
             self.model = AutoModelForSeq2SeqLM.from_pretrained(self.config.model_checkpoint).to(self.device)    # if GPU add: ", torch_dtype=torch.bfloat16"
+
             logger.info('Model and tokenizer loaded successfully.')
         except Exception as e:
             logger.error(f"Failed to load model or tokenizer: {e}")
@@ -74,7 +76,7 @@ class ModelTraining:
             gradient_accumulation_steps=self.config.gradient_accumulation_steps,
             load_best_model_at_end=self.config.load_best_model_at_end,
             report_to=self.config.report_to,
-            save_total_limit=self.config.save_total_limit
+            # save_total_limit=self.config.save_total_limit
         )
 
         return trainer_args
@@ -93,14 +95,14 @@ class ModelTraining:
 
             # Apply LoRA to the model
             lora_config = self.set_lora_config()
-            model_peft = get_peft_model(self.model, lora_config)
+            self.peft_model = get_peft_model(self.model, lora_config)
 
             # Configure training arguments
             trainer_args = self._get_training_args()
 
             # Initialize a Trainer instance
             trainer = Trainer(
-                model=model_peft,
+                model=self.peft_model,
                 args=trainer_args,
                 tokenizer=self.tokenizer,
                 data_collator=data_collator,
@@ -128,7 +130,7 @@ class ModelTraining:
             tokenizer_save_path = str(self.config.tokenizer_dir)
 
             logger.info(f"Saving model to {model_save_path} and tokenizer to {tokenizer_save_path}...")
-            self.model.save_pretrained(model_save_path)
+            self.peft_model.save_pretrained(model_save_path)
             self.tokenizer.save_pretrained(tokenizer_save_path)
             logger.info("Model and tokenizer saved successfully.")
         except Exception as e:

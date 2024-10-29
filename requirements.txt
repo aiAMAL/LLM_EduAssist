@@ -7,4 +7,7 @@ datasets
 ensure
 python-box
 peft
+loralib
+evaluate
+rouge_score
 -e .

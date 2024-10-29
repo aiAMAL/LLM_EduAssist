@@ -54,3 +54,15 @@ class ModelTrainingConfig:
     task_type: str
     
 
+@dataclass(frozen=True)
+class ModelEvaluationConfig:
+    root_dir: Path
+    dataset_dir: Path
+    tokenized_test_dataset_dir: Path
+    model_dir: Path
+    tokenizer_dir: Path
+    metrics_file_name: Path
+    base_model_checkpoint: Path
+
+
+

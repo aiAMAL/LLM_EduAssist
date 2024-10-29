@@ -24,5 +24,11 @@ model_training:
   tokenizer_dir: artifacts/model_training/tokenizer
   model_checkpoint: *tokenizer_checkpoint
 
-
-
+model_evaluation:
+  root_dir: artifacts/model_evaluation
+  dataset_dir: artifacts/data_ingestion/samsum_dataset     # test set is not transformed yet
+  tokenized_test_dataset_dir: artifacts/model_evaluation/tokenized_test_samsum_dataset
+  model_dir: artifacts/model_training/Summarization_Google_F5
+  tokenizer_dir: artifacts/model_training/tokenizer
+  metrics_file_name: artifacts/model_evaluation/metrics.csv
+  base_model_checkpoint: *tokenizer_checkpoint

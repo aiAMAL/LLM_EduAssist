@@ -51,7 +51,7 @@ class ModelTraining:
             gradient_accumulation_steps=self.config.gradient_accumulation_steps,
             load_best_model_at_end=self.config.load_best_model_at_end,
             report_to=self.config.report_to,
-            save_total_limit=self.config.save_total_limit
+            # save_total_limit=self.config.save_total_limit
         )
 
         return trainer_args
