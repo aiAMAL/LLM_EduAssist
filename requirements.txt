@@ -10,4 +10,6 @@ peft
 loralib
 evaluate
 rouge_score
+fastapi
+uvicorn
 -e .
