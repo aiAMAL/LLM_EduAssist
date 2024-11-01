@@ -3,7 +3,8 @@ import sys
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import Response, RedirectResponse
-from src.TextSummarization.pipeline.pipeline_prediction import PredictionPipeline
+# from src.TextSummarization.pipeline.pipeline_prediction import PredictionPipeline
+from src.TextSummarization.pipeline.langchain_prediction import PredictionPipeline
 
 app = FastAPI()
 

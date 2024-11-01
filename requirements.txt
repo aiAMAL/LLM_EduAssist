@@ -12,4 +12,7 @@ evaluate
 rouge_score
 fastapi
 uvicorn
+langchain
+langchain_community
+langchain-huggingface
 -e .
